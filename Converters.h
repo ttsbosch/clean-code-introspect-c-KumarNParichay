@@ -1,4 +1,4 @@
-int parseIntFromString(const char* str, int* value) {
+int tryToConvertToIntFromString(const char* str, int* value) {
     char* endPtr;
     *value = strtol(str, &endPtr, 10);
     if (endPtr == str) {
@@ -7,7 +7,7 @@ int parseIntFromString(const char* str, int* value) {
     return 1;
 }
 
-int parseDoubleFromString(const char* str, double* value) {
+int tryToConvertToDoubleFromString(const char* str, double* value) {
     char* endPtr;
     *value = strtod(str, &endPtr);
     if (endPtr == str) {
