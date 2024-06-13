@@ -32,12 +32,12 @@ void CsvToXmlTradeConverter(FILE* stream) {
         }
 
         int tradeAmount;
-        if (!parseIntFromString(fields[1], &tam)) {
+        if (!tryToConvertToIntFromString(fields[1], &tam)) {
             fprintf(stderr, "WARN: Trade amount on line %d not a valid integer: '%s'\n", lineCount + 1, fields[1]);
         }
 
         double tradePrice;
-        if (!parseDoubleFromString(fields[2], &tp)) {
+        if (!tryToConvertToDoubleFromString(fields[2], &tp)) {
             fprintf(stderr, "WARN: Trade price on line %d not a valid decimal: '%s'\n", lineCount + 1, fields[2]);
         }
 
