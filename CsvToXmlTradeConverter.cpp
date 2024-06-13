@@ -2,66 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-typedef struct {
-    char sourceCurrency[256];
-    char destinationCurrency[256]; 
-    float Lots;
-    double Price;
-} tradeRecord;
+#include <Traderecord.h>
 
 
-char** SplitString(const char* str, char delimiter) {
-    int count = 0;
-    const char* ptr = str;
-    while (*ptr != '\0') {
-        if (*ptr++ == delimiter) {
-            count++;
-        }
-    }
 
-    char** tokens = (char**)malloc(sizeof(char*) * (count + 2));
-    int i = 0;
-    ptr = str;
-    char* token = (char*)malloc(strlen(str) + 1);
-    int j = 0;
-    while (*ptr != '\0') {
-        if (*ptr == delimiter) {
-            token[j] = '\0';
-            tokens[i++] = strdup(token);
-            j = 0;
-        } else {
-            token[j++] = *ptr;
-        }
-        ptr++;
-    }
-    token[j] = '\0';
-    tokens[i++] = strdup(token);
-    tokens[i] = NULL;
-    free(token);
-    return tokens;
-}
-
-
-int parseIntFromString(const char* str, int* value) {
-    char* endPtr;
-    *value = strtol(str, &endPtr, 10);
-    if (endPtr == str) {
-        return 0;
-    }
-    return 1;
-}
-
-int parseDoubleFromString(const char* str, double* value) {
-    char* endPtr;
-    *value = strtod(str, &endPtr);
-    if (endPtr == str) {
-        return 0;
-    }
-    return 1;
-}
-
-void Process(FILE* stream) {
+void CsvToXmlTradeConverter(FILE* stream) {
     char line[1024];
     tradeRecord objects[1024];
     int lineCount = 0;
