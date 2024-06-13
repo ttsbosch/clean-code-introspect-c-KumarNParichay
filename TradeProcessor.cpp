@@ -4,11 +4,11 @@
 #include <errno.h>
 
 typedef struct {
-    char SC[256]; // SourceCurrency
-    char DC[256]; // DestibationCurrency
+    char sourceCurrency[256];
+    char destinationCurrency[256]; 
     float Lots;
     double Price;
-} TR;
+} tradeRecord;
 
 
 char** SplitString(const char* str, char delimiter) {
@@ -43,19 +43,19 @@ char** SplitString(const char* str, char delimiter) {
 }
 
 
-int intGetFromString(const char* str, int* value) {
-    char* endptr;
-    *value = strtol(str, &endptr, 10);
-    if (endptr == str) {
+int parseIntFromString(const char* str, int* value) {
+    char* endPtr;
+    *value = strtol(str, &endPtr, 10);
+    if (endPtr == str) {
         return 0;
     }
     return 1;
 }
 
-int toDouble(const char* str, double* value) {
-    char* endptr;
-    *value = strtod(str, &endptr);
-    if (endptr == str) {
+int parseDoubleFromString(const char* str, double* value) {
+    char* endPtr;
+    *value = strtod(str, &endPtr);
+    if (endPtr == str) {
         return 0;
     }
     return 1;
@@ -63,7 +63,7 @@ int toDouble(const char* str, double* value) {
 
 void Process(FILE* stream) {
     char line[1024];
-    TR objects[1024];
+    tradeRecord objects[1024];
     int lineCount = 0;
     int objectCount = 0;
 
@@ -86,20 +86,20 @@ void Process(FILE* stream) {
             continue;
         }
 
-        int tam;
-        if (!intGetFromString(fields[1], &tam)) {
+        int tradeAmount;
+        if (!parseIntFromString(fields[1], &tam)) {
             fprintf(stderr, "WARN: Trade amount on line %d not a valid integer: '%s'\n", lineCount + 1, fields[1]);
         }
 
-        double tp;
-        if (!toDouble(fields[2], &tp)) {
+        double tradePrice;
+        if (!parseDoubleFromString(fields[2], &tp)) {
             fprintf(stderr, "WARN: Trade price on line %d not a valid decimal: '%s'\n", lineCount + 1, fields[2]);
         }
 
-        strncpy(objects[objectCount].SC, fields[0], 3);
-        strncpy(objects[objectCount].DC, fields[0] + 3, 3);
-        objects[objectCount].Lots = tam / LotSize;
-        objects[objectCount].Price = tp;
+        strncpy(objects[objectCount].sourceCurrency, fields[0], 3);
+        strncpy(objects[objectCount].destinationCurrency, fields[0] + 3, 3);
+        objects[objectCount].Lots = tradeAmount / LotSize;
+        objects[objectCount].Price = tradePrice;
         objectCount++;
         lineCount++;
     }
@@ -108,8 +108,8 @@ void Process(FILE* stream) {
     fprintf(outFile, "<TradeRecords>\n");
     for (int i = 0; i < objectCount; i++) {
         fprintf(outFile, "\t<TradeRecord>\n");
-        fprintf(outFile, "\t\t<SourceCurrency>%s</SourceCurrency>\n", objects[i].SC);
-        fprintf(outFile, "\t\t<DestinationCurrency>%s</DestinationCurrency>\n", objects[i].DC);
+        fprintf(outFile, "\t\t<SourceCurrency>%s</SourceCurrency>\n", objects[i].sourceCurrency);
+        fprintf(outFile, "\t\t<DestinationCurrency>%s</DestinationCurrency>\n", objects[i].destinationCurrency);
         fprintf(outFile, "\t\t<Lots>%d</Lots>\n", objects[i].Lots);
         fprintf(outFile, "\t\t<Price>%f</Price>\n", objects[i].Price);
         fprintf(outFile, "\t</TradeRecord>\n");
